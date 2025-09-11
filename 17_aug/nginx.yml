@@ -1,0 +1,20 @@
+---
+
+- name: Install nginx server
+  hosts: aws1
+  become: yes
+  tasks:
+  - name: Install nginx
+    ansible.builtin.dnf: 
+      name: nginx
+      state: present
+  - name: Copy the index.html to default location
+    ansible.builtin.copy: 
+      src: index.html
+      dest: /usr/share/nginx/html/index.html
+      mode: 0644
+  - name: start nginx
+    ansible.builtin.service:
+      name: nginx
+      state: started
+      enabled: yes
