@@ -1,0 +1,7 @@
+all:
+  hosts:
+    aws1:  
+      ansible_host: 56.228.28.141
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: /home/suzit05/ubuntu.pem
+
