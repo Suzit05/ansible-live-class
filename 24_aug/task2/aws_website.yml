@@ -1,0 +1,88 @@
+---
+- name: Launch ec2 instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    
+
+    - name: launch ec2 instance
+      amazon.aws.ec2_instance:
+        name: "{{ instance_name }}"
+        instance_type: "{{ instance_type }}"
+        key_name: "{{ key_name }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+        security_groups: "{{ security_group }}"
+        network:
+          assign_public_ip: true
+        tags:
+          Environment: Dev
+      register: ec2
+
+    - name: print public IP
+      debug:
+        msg: "Public IP: {{ ec2.instances[0].public_ip_address }}"
+
+    - name: add new instance to the inventory
+      add_host:
+        name: webserver
+        ansible_host: "{{ ec2.instances[0].public_ip_address }}"
+        ansible_user: ubuntu   # or ec2-user depending on AMI
+        ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem  #ssh m daal k rkhe hai , for future use
+
+    - name: Wait for SSH to come up
+      wait_for:
+        host: "{{ ec2.instances[0].public_ip_address }}"
+        port: 22
+        delay: 10
+        timeout: 300
+
+
+# ⬇️ SECOND PLAY STARTS HERE
+- name: Deploy website on EC2 instance
+  hosts: webserver
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install openJDK
+      apt:
+        name: openjdk-11-jdk
+        state: present
+   
+    
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Start and enable nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    
+
+    - name: Copy website files(index.html)
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        group: www-data
+        owner: www-data
+        mode: "0644"
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
