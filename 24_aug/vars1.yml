@@ -1,0 +1,2 @@
+region: eu-north-1 #aws m yhi configure hai
+instance_id: i-04a5aec9031acba31 #paste it from ec2 dashboard
