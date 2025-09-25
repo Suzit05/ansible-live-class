@@ -1,0 +1,23 @@
+---
+# tasks file for create_instance
+- name: Launch ec2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ instance_name }}"
+    key_name: "{{ key_name }}"
+    image_id: "{{ ami_id }}"
+    region: "{{ region }}"
+    instance_type: "{{ instance_type }}"
+    security_groups: "{{ security_group }}"
+    wait: yes
+    count: 1
+    network:
+      assign_public_ip: yes
+    tags:
+      Environment: Dev
+  register: ec2
+
+- name: Add new instance to the inventory group 
+  add_host:
+    name: "{{ item.public_ip_address }}"
+    groups: launched
+  loop: "{{ ec2.instances }}"

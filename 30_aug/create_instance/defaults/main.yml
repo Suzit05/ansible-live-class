@@ -1,0 +1,8 @@
+---
+instance_name: dev-ubuntu-instance
+instance_type: t3.micro
+ami_id: ami-0a716d3f3b16d290c
+region: eu-north-1
+key_name: Ansible25
+security_group: lauch-wizard-2
+
