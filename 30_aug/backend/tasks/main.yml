@@ -1,2 +1,29 @@
 ---
-# tasks file for backend
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install nodejs
+  apt:
+    name: nodejs
+    state: present
+  become: yes
+
+- name: Install npm
+  apt:
+    name: npm
+    state: present
+  become: yes
+
+- name: Deploy backend application
+  copy:
+    src: app.js
+    dest: /var/www/html/app.js
+  become: yes
+
+- name: Start backend
+  shell: "nohup node /var/www/html/app.js &"
+  args:
+    chdir: /var/www/html
+  become: yes

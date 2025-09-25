@@ -1,6 +1,6 @@
 all:
   hosts:
-    aws1:
-      ansible_host: 
-      ansible_user:
-      ansible_ssh_private_key_file: Ansible25.pem
+    webserver:
+      ansible_host: 13.53.207.153
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem 

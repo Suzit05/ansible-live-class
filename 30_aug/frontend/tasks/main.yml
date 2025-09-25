@@ -1,2 +1,24 @@
 ---
-# tasks file for frontend
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+  become: yes
+
+- name: Deploy frontend code
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+  become: yes
+
+- name: Start and enable nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: yes

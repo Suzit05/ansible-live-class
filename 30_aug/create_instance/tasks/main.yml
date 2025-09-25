@@ -16,8 +16,21 @@
       Environment: Dev
   register: ec2
 
-- name: Add new instance to the inventory group 
-  add_host:
-    name: "{{ item.public_ip_address }}"
+- name: Add new instance to inventory group 
+  add_host: 
+    hostname: "{{ item.public_ip_address }}"
     groups: launched
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
   loop: "{{ ec2.instances }}"
+  
+- name: Save dynamic inventory to file
+  copy:
+    dest: ./inventory.yml
+    content: |
+      all:
+        hosts:
+          webserver:
+            ansible_host: {{ ec2.instances[0].public_ip_address }}
+            ansible_user: ubuntu
+            ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem 
