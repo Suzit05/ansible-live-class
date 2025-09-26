@@ -1,0 +1,48 @@
+---
+- name: Launch ubuntu instances
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - vars.yml   # contains: instances_name, instance_type, key_name, ami_id, region, security_group
+
+  tasks:
+    - name: Launch EC2 instances
+      amazon.aws.ec2_instance:
+        name: "{{ instances_name }}"
+        instance_type: "{{ instance_type }}"
+        key_name: "{{ key_name }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        security_groups: "{{ security_group }}"
+        wait: yes
+        count: 2
+        network:
+          assign_public_ip: yes
+        tags:
+          Environment: Dev
+      register: ec2
+
+    - name: Add instances to the inventory group 'launched'
+      add_host:
+        hostname: "{{ item.public_ip_address }}"
+        groups: launched
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+      loop: "{{ ec2.instances }}"
+
+    - name: Save dynamic inventory to a file
+      copy:
+        dest: ./inventory_jenkins.yml
+        content: |
+          all:
+            hosts:
+              aws1:
+                ansible_host: {{ ec2.instances[0].public_ip_address }}
+                ansible_user: ubuntu
+                ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+              aws2:
+                ansible_host: {{ ec2.instances[1].public_ip_address }}
+                ansible_user: ubuntu
+                ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem

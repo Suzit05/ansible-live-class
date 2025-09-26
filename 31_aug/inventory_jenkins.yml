@@ -1,0 +1,10 @@
+all:
+  hosts:
+    aws1:
+      ansible_host: 16.16.68.149
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+    aws2:
+      ansible_host: 13.48.177.236
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
