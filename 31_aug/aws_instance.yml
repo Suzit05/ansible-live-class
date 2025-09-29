@@ -17,7 +17,7 @@
         image_id: "{{ ami_id }}"
         region: "{{ region }}"
         security_groups: "{{ security_group }}"
-        wait: yes
+        wait: yes #note------ no count here (other wise each instance will be twice created)
         network:
           assign_public_ip: yes
         tags:

@@ -1,0 +1,65 @@
+
+#create dynamic separate inventory for separate instance.
+---
+- name: Launch two instances on ubuntu
+  hosts: localhost
+  connection: ansible_host
+  gather_facts: no
+
+  vars_files:
+    - vars1.yml
+
+  tasks:
+
+    - name: Launch EC2 instances
+      amazon.aws.ec2_instance:
+        name: "{{ item }}"
+        region: "{{ region }}"
+        key_name: "{{ key_name }}"
+        image_id: "{{ ami_id }}"
+        security_groups: "{{ security_group }}"
+        instance_type: "{{ instance_type }}"
+        wait: yes
+        
+        tags:
+          Environment: Dev
+        network:
+          assign_public_ip: yes
+
+      register: ec2_result
+      loop: "{{ instance_names }}"   # Loop over the list of names from vars.yml
+
+    - name: Add instances to the launched group
+      add_host:
+        hostname: "{{ item.instances[0].public_ip_address}}"
+        groups: launched
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+      loop: "{{ec2_result.results}}"
+
+    - name: Create inventory1 for instance1
+      copy:
+        dest: ./inventory1.yml
+        content: |
+          all:
+            hosts:
+              instance1:
+                ansible_host: {{ ec2_result.results[0].instances[0].public_ip_address }}
+                ansible_user: ubuntu
+                ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+
+    - name: Create inventory2 for instance2
+      copy:
+        dest: ./inventory2.yml
+        content: |
+          all:
+            hosts:
+              instance2:
+                ansible_host: {{ ec2_result.results[1].instances[0].public_ip_address}}
+                ansible_user: ubuntu
+                ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
+
+
+
+    
+  

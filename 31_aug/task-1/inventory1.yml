@@ -1,0 +1,6 @@
+all:
+  hosts:
+    instance1:
+      ansible_host: 13.49.21.234
+      ansible_user: ubuntu
+      ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem

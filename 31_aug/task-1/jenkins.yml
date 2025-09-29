@@ -1,0 +1,55 @@
+---
+- name: Install jenkins on ubuntu
+  hosts: instance2
+  become: yes
+  tasks:
+
+    - name: Remove any broken Jenkins repo file
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/pkg_jenkins_io_debian.list
+        state: absent
+
+    - name: Install java(jdk)
+      apt:
+        name: openjdk-21-jdk
+        state: present
+        update_cache: yes
+
+    - name: Download Jenkins GPG key
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '0644'
+
+
+    - name: Add Jenkins repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+    
+    - name: Update apt cache 
+      apt: 
+        update_cache: yes
+
+    - name: Start jenkins
+      apt: 
+        name: jenkins
+        state: present
+    
+    - name: Start Jenkins service
+      ansible.builtin.service:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Ensure port 8080 is open for jenkins
+      ufw:
+        rule: allow
+        port: 8080
+        proto: tcp
+      when: ansible_facts['os_family'] == 'Debian'
+       
+
+       
+      
