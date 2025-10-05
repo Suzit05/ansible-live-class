@@ -1,10 +1,10 @@
 all:
   hosts:
     aws1:
-      ansible_host: 51.20.40.150 # Correct variable path for aws1
+      ansible_host: 16.170.148.79 # Correct variable path for aws1
       ansible_user: ubuntu
       ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem
     aws2:
-      ansible_host: 13.51.48.126 # Correct variable path for aws2
+      ansible_host: 13.51.157.167 # Correct variable path for aws2
       ansible_user: ubuntu
       ansible_ssh_private_key_file: ~/.ssh/Ansible25.pem

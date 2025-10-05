@@ -1,0 +1,29 @@
+- name: Create loadbalancer for jenkins
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  
+  vars:
+    region: eu-north-1
+    instances:
+      - i-01f2bf2a1ed7d99d4
+      - i-0f60b8044d8c736e3
+
+  tasks: 
+    - name: Create Load balancer
+      amazon.aws.ec2_elb_lb:
+        name: jenkins-lb 
+        region: "{{ region }}"
+        state: present
+        instance_ids: "{{ instances }}" # Attaches the instances defined in vars
+        zones:
+          - eu-north-1a
+          - eu-north-1b
+          - eu-north-1c
+        listeners:
+          - protocol: HTTP
+            load_balancer_port: 80
+            instance_protocol: HTTP
+            instance_port: 8080
+
+        
